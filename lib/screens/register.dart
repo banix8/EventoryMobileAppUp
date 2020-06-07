@@ -21,7 +21,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   String _picked = '';
 
  void addData() {
-    var url = "http://192.168.1.2/eventory/REST_API/adddata.php";
+    var url = "http://192.168.1.2/eventory_updated/login.php";
 
     http.post(url, body: {
       "fullName":_fullnameControl.text,

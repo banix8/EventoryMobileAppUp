@@ -3,19 +3,22 @@ import 'package:image_picker_modern/image_picker_modern.dart';
 import 'dart:async';
 import 'dart:io';
 import 'dart:convert';
-
 import 'package:http/http.dart' as http;
 import 'package:async/async.dart';
 import 'package:path/path.dart';
 
 class Profile extends StatefulWidget {
-  @override
   
+  final List list;
+  final int index;
+
+  Profile({this.list, this.index});
+
+  @override
   _ProfileState createState() => _ProfileState();
 }
 
 class _ProfileState extends State<Profile> {
-  
   final TextEditingController _fullnameControl = TextEditingController();
   final TextEditingController _emailControl = TextEditingController();
   final TextEditingController _phoneControl = TextEditingController();
@@ -32,7 +35,9 @@ class _ProfileState extends State<Profile> {
   void initState() {
     //added by Jhunes
     super.initState();
-    getData();
+    supplierData();
+    clientData();
+  
   } //added by Jhunes
 
   File _image;
@@ -52,6 +57,13 @@ class _ProfileState extends State<Profile> {
   String fbpage = '';
 
 
+  //Client Strings
+
+  String clientPhone = '';
+  String clientAddress = '';
+  String clientGender = '';
+
+
 
   Future getImage() async {
     var image = await
@@ -63,9 +75,13 @@ class _ProfileState extends State<Profile> {
     });
   }
 
- Future<List> getData() async {
-    final response = await http.post("http://192.168.1.9/eventory_updated/login.php", body: {
-      "event": "profile",
+
+
+
+
+ Future<List> supplierData() async {
+    final response = await http.post("http://192.168.1.11/eventory_updated/login.php", body: {
+      "event": "supplier",
     });
      print(response.body);
      
@@ -73,8 +89,8 @@ class _ProfileState extends State<Profile> {
 
     
     setState(() {
-        // image = datauser[0]['image'];
-        name = datauser[0]['fullName'];
+        //_image = datauser[0]['image'];
+          name = datauser[0]['fullName'];
         _email = datauser[0]['email'];
         _picked = datauser[0]['accountType'];
         phone = datauser[0]['supplierPhone'];
@@ -89,49 +105,48 @@ class _ProfileState extends State<Profile> {
      return json.decode(response.body);
      
   }
+
   
-  // Future<String> getData() async {
-  //   http.Response response = await http.get(
-  //     Uri.encodeFull("http://192.168.1.2/eventory/REST_API/getdata.php"),
-  //     headers: {
-  //      "Accept": "application/json" 
-  //     }
-  //   );
-
-  //   print(response.body);
-
-  //    List data = json.decode(response.body);
-  //   // print(data[0]["email"]);
-  //   // print(data[0]["password"]);
-  //   // print(data[0]["fullName"]);
-  //   // print(data[0]["accountType"]);
-  //   setState(() {
-  //       name = data[0]['supplierPhone'];
-  //       emailAdd = data[0]['supplierAddress'];
+ Future<List> clientData() async {
+    final response = await http.post("http://192.168.1.11/eventory_updated/login.php", body: {
+      "event": "client",
+    });
+     print(response.body);
      
-  //     });
-  // }
+     var datauser = json.decode(response.body); 
 
-  void updateData() {
-    var url = "http://192.168.1.9/eventory_updated/REST_API/updateData.php";
+    
+    setState(() {
+        //_image = datauser[0]['image'];
+         
+         clientPhone = datauser[0]['userPhone'];
+         clientAddress = datauser[0]['userAddress'];
+         clientGender = datauser[0]['userGender'];
+     
 
-    http.post(url, body: {
-      "fullName": _fullnameControl.text,
-      "email": _emailControl.text,
+       
+      });
+     return json.decode(response.body);
+     
+  }
+
+
+
+ void updateData() {
+    var url="http://192.168.1.11/eventory_updated/editdata.php";
+    http.post(url,body: {
+      "supplierID": '1',
       "supplierPhone": _phoneControl.text,
       "supplierAddress": _addressControl.text,
-      "supplierBio": _bioControl .text, 
-      "supplierCategory": _categoryControl .text, 
-      "supplierRate": _srateControl.text,
-      "supplierYears": _yearsxpControl.text,
-      "supplierFacebook": _fbpageControl.text,
+      "supplierCategory": _categoryControl.text, 
     });
   }
+  
 
 Future upload(File imageFile) async{
   var stream= new http.ByteStream(DelegatingStream.typed(imageFile.openRead()));
   var length= await imageFile.length();
-  var uri = Uri.parse("http://192.168.1.2/eventory/REST_API/imgUpload.php");
+  var uri = Uri.parse("http://192.168.1.11/eventory_updated/imgUpload.php");
 
   var request = new http.MultipartRequest("POST", uri);
 
@@ -148,16 +163,6 @@ Future upload(File imageFile) async{
   response.stream.transform(utf8.decoder).listen((value) {
       print(value);
     });
-    //  var url = "http://192.168.1.2/eventory/REST_API/updateData.php";
-
-    // http.post(url, body: {
-    //   "supplierPhone":_phoneControl.text,
-    //   "supplierAddress":  _addressControl.text,
-    //   "supplierBio": _bioControl .text, 
-    //   "supplierRate": _srateControl.text,
-    //   "supplierYears": _yearsxpControl.text,
-       
-    // });
 }
 
   @override
@@ -268,9 +273,9 @@ Future upload(File imageFile) async{
               TextField(
                 controller: _fullnameControl,
                 onChanged: (value){
-                  debugPrint('fullname: $value');
+                
                   fullname = value; //SEND THIS DATA
-                  debugPrint(fullname);
+                
                 },
                 decoration: InputDecoration(
                   icon: Icon(Icons.person),
@@ -286,9 +291,9 @@ Future upload(File imageFile) async{
               TextField(
                 controller: _emailControl,
                 onChanged: (value){
-                  debugPrint('email: $value');
+          
                   email = value; //SEND THIS DATA
-                  debugPrint(email);
+             
                 },
                 decoration: InputDecoration(
                   icon: Icon(Icons.email),
@@ -304,9 +309,9 @@ Future upload(File imageFile) async{
               TextField(
                 controller: _phoneControl,
                 onChanged: (value){
-                  debugPrint('phone: $value'); //SEND THIS DATA
+               
                   phone = value;
-                  debugPrint(phone);
+      
                 },
                 decoration: InputDecoration(
                   icon: Icon(Icons.phone),
@@ -322,9 +327,9 @@ Future upload(File imageFile) async{
               TextField(
                 controller: _addressControl,
                 onChanged: (value){
-                  debugPrint('address: $value');
+                 
                   address = value; //SEND THIS DATA
-                  debugPrint(address);
+               
                 },
                 decoration: InputDecoration(
                   icon: Icon(Icons.home),
@@ -358,9 +363,9 @@ Future upload(File imageFile) async{
               TextField(
                 controller: _bioControl,
                 onChanged: (value){
-                  debugPrint('bio: $value');
+               
                   bio = value; //SEND THIS DATA
-                  debugPrint(bio);
+                
                 },
                 decoration: InputDecoration(
                   icon: Icon(Icons.subject),
@@ -376,7 +381,7 @@ Future upload(File imageFile) async{
               TextField(
                 controller: _categoryControl,
                 onChanged: (value){
-                  debugPrint('category: $value');
+               
                    category = value; //SEND THIS DATA
                   // debugPrint(category);
                 },
@@ -394,9 +399,9 @@ Future upload(File imageFile) async{
               TextField(
                 controller: _srateControl,
                 onChanged: (value){
-                  debugPrint('srate: $value');
+                
                   srate = value; //SEND THIS DATA
-                  debugPrint(srate);
+                 
                 },
                 decoration: InputDecoration(
                   icon: Icon(Icons.local_offer),
@@ -412,9 +417,9 @@ Future upload(File imageFile) async{
               TextField(
                 controller: _yearsxpControl,
                 onChanged: (value){
-                  debugPrint('yearsxp: $value');
+                
                   yearsxp = value; //SEND THIS DATA
-                  debugPrint(yearsxp);
+                
                 },
                 decoration: InputDecoration(
                   icon: Icon(Icons.hourglass_full),
@@ -430,9 +435,9 @@ Future upload(File imageFile) async{
               TextField(
                 controller: _fbpageControl,
                 onChanged: (value){
-                  debugPrint('fbpage: $value');
+                  
                   fbpage = value; //SEND THIS DATA
-                  debugPrint(fbpage);
+                 
                 },
                 decoration: InputDecoration(
                   icon: Icon(Icons.web),
@@ -572,13 +577,13 @@ Future upload(File imageFile) async{
               ),
               TextField(
                 onChanged: (value){
-                  debugPrint('full name: $value');
+                 
                   fullname = value; //SEND THIS DATA
-                  debugPrint(fullname);
+               
                 },
                 decoration: InputDecoration(
                   icon: Icon(Icons.person),
-                  labelText: 'Full Name',
+                  labelText: '$name',
                   labelStyle: TextStyle(
                     fontSize: 17,
                     fontWeight: FontWeight.w700,
@@ -589,13 +594,13 @@ Future upload(File imageFile) async{
               ),
               TextField(
                 onChanged: (value){
-                  debugPrint('email: $value');
+               
                   email = value; //SEND THIS DATA
-                  debugPrint(email);
+               
                 },
                 decoration: InputDecoration(
                   icon: Icon(Icons.email),
-                  labelText: 'Email',
+                  labelText: '$_email',
                   labelStyle: TextStyle(
                     fontSize: 17,
                     fontWeight: FontWeight.w700,
@@ -607,13 +612,13 @@ Future upload(File imageFile) async{
               TextField(
                 controller: _phoneControl,
                 onChanged: (value){
-                  debugPrint('phone: $value');
+              
                   phone = value; //SEND THIS DATA
-                  debugPrint(phone);
+                
                 },
                 decoration: InputDecoration(
                   icon: Icon(Icons.phone),
-                  labelText: 'Phone',
+                  labelText: '$clientPhone',
                   labelStyle: TextStyle(
                     fontSize: 17,
                     fontWeight: FontWeight.w700,
@@ -625,13 +630,13 @@ Future upload(File imageFile) async{
               TextField(
                 controller: _addressControl,
                 onChanged: (value){
-                  debugPrint('address: $value');
+                  
                   address = value; //SEND THIS DATA
-                  debugPrint(address);
+               
                 },
                 decoration: InputDecoration(
                   icon: Icon(Icons.home),
-                  labelText: 'Address',
+                  labelText: '$clientAddress',
                   labelStyle: TextStyle(
                     fontSize: 17,
                     fontWeight: FontWeight.w700,

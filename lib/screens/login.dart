@@ -49,47 +49,10 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   } //added by Jhunes
 
-
-//  Future<List> _login() async {
-//   final response = await http.post("http://192.168.1.11/eventory/REST_API/login.php", body: {
-//     "email": email.text,
-//     "password": password.text,
-//   });
-
-//   var datauser = json.decode(response.body);
-
-//   if(datauser.length==0){
-//     setState(() {
-//           msg="Login Fail";
-//         });
-//   }else{
-//     if(datauser[0]['accountType']=='I am Client'){
-//       Navigator.pushReplacementNamed(context, '/Client');
-//       Toast.show("Login Successfully as Client", context,
-//       duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
-      
-//     }else if(datauser[0]['accountType']=='I am Supplier'){
-//       Navigator.pushReplacementNamed(context, '/Supplier');
-//       Toast.show("Login Successfully as Supplier", context,
-//       duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
-//     }
-//      setState(() {
-        
-//         username= datauser[0]['fullName'];
-//         emailAdd = datauser[0]['email'];
-//         accountType = datauser[0]['accountType'];
-//       });
-
-    
-    
-//   }
-//   return datauser;
-// }
-
 Future<List> _login() async {
     print("Hello");
 
-    final response = await http.post("http://192.168.1.9/eventory_updated/login.php", body: {
+    final response = await http.post("http://192.168.1.11/eventory_updated/login.php", body: {
       "event": "login",
       "email": email.text,
       "password": password.text
@@ -141,7 +104,9 @@ Future<List> _login() async {
       Toast.show("Login Successfully as Supplier", context,
       duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
     }
+     
    }
+   return datauser;
   } //added Jhunes
 
 
